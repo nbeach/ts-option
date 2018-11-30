@@ -127,7 +127,7 @@ describe("Option", () => {
             expect(subject.orNull).to.equal("sasquatchIt")
         })
 
-        it.only("when the predicate returns false returns an empty option", () => {
+        it("when the predicate returns false returns an empty option", () => {
             const subject = Some("sasquatchIt").filter(species => species !== "sasquatchIt")
             expect(subject.orNull).to.be.null
         })

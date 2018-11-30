@@ -1,14 +1,14 @@
-export interface Option<A> extends Array<A> {
+export interface Option<A> extends Readonly<Array<A>> {
     map<B>(callback: (value: A, index: number, array: A[]) => B, thisArg?: any): Option<B>
+    filter(callback: (value: A, index: number, array: A[]) => any, thisArg?: any): Option<A>
     flatMap<B>(callback: (value: A) => Option<B>): Option<B>
     flatten<T>(): Option<T>
-    filter(callback: (value: A, index: number, array: A[]) => any, thisArg?: any): Option<A>
     orElse<B>(alternative: Option<B>): Option<A | B>
     getOrElse<B>(defaultValue: B): A | B
     readonly get: A
     readonly orNull: A | null
-    readonly nonEmpty: boolean
     readonly isEmpty: boolean
+    readonly nonEmpty: boolean
 }
 
 class OptionInstance<A> extends Array<A> implements Option<A>  {
@@ -21,7 +21,7 @@ class OptionInstance<A> extends Array<A> implements Option<A>  {
     }
 
     public map<B>(callback: (value: A, index: number, array: A[]) => B, thisArg: any = this): Option<B> {
-        return this.isEmpty ? None : new OptionInstance(Array.prototype.map.call(this, callback, thisArg)[0])
+        return this.isEmpty ? None : new OptionInstance([this[0]].map(callback, thisArg)[0])
     }
 
     public flatMap<B>(callback: (value: A) => Option<B>): Option<B> {
@@ -33,7 +33,7 @@ class OptionInstance<A> extends Array<A> implements Option<A>  {
     }
 
     public filter(callback: (value: A, index: number, array: A[]) => any, thisArg: any = this): Option<A> {
-        return new OptionInstance(Array.prototype.filter.call(this, callback, thisArg)[0])
+        return this.isEmpty ? None : new OptionInstance([this[0]].filter(callback, thisArg)[0])
     }
 
     public orElse<B>(alternative: Option<B>): Option<A | B> {
