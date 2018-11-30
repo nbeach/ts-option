@@ -11,7 +11,7 @@
     "noImplicitReturns": true,
     "suppressImplicitAnyIndexErrors": true,
     "lib": ["es6", "dom"],
-    "types": ["node", "mocha", "chai-dom", "sinon-chai",  "webpack-env"],
+    "types": ["node", "mocha"],
     "declaration" : true
   }
 }
