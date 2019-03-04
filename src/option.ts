@@ -24,6 +24,7 @@ class OptionInstance<A> extends Array<A> implements Option<A>  {
         return this.isEmpty ? None : new OptionInstance([this[0]].map(callback, thisArg)[0])
     }
 
+    //TODO: make flatmap and flatten consistent with ES7 spec
     public flatMap<B>(callback: (value: A) => Option<B>): Option<B> {
         return this.map(callback).flatten()
     }
