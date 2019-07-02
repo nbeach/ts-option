@@ -1,15 +1,20 @@
-export interface Option<A> extends Readonly<Array<A>> {
+export interface Option<A> extends Array<A> {
     map<B>(callback: (value: A, index: number, array: A[]) => B, thisArg?: any): Option<B>
     filter(callback: (value: A, index: number, array: A[]) => any, thisArg?: any): Option<A>
-    flatMap<B>(callback: (value: A) => Option<B>): Option<B>
-    flatten<T>(): Option<T>
+    flatMap<U>(callback: (value: A, index: number, array: A[]) => U | Option<U>, thisArg?: any): Option<U>
     orElse<B>(alternative: Option<B>): Option<A | B>
     getOrElse<B>(defaultValue: B): A | B
     readonly get: A
     readonly orNull: A | null
     readonly isEmpty: boolean
     readonly nonEmpty: boolean
+
+
+
+    flat<U>(this: NestedOptions<U>, depth?: number): Option<U>
 }
+
+type NestedOptions<U> = Option<Option<Option<Option<Option<U>>>>> | Option<Option<Option<Option<U>>>> | Option<Option<Option<U>>> | Option<Option<U>> | Option<U>
 
 class OptionInstance<A> extends Array<A> implements Option<A>  {
     constructor(value: A | undefined | null) {
@@ -24,13 +29,14 @@ class OptionInstance<A> extends Array<A> implements Option<A>  {
         return this.isEmpty ? None : new OptionInstance([this[0]].map(callback, thisArg)[0])
     }
 
-    //TODO: make flatmap and flatten consistent with ES7 spec
-    public flatMap<B>(callback: (value: A) => Option<B>): Option<B> {
-        return this.map(callback).flatten()
+    public flatMap<U, This = Option<U>>(callback: (this: This, value: A, index: number, array: A[]) => U | Option<U>, thisArg?: This): Option<U> {
+        return this.isEmpty ? None : this.map(callback).flat()
     }
 
-    public flatten<T>(): Option<T> {
-        return this.nonEmpty ? this.get as any : None
+    public flat<U>(depth: number = 1): Option<any> {
+        return this.isEmpty ? None : Array
+            .from(Array(depth).keys())
+            .reduce(option => (option as any).get, this)
     }
 
     public filter(callback: (value: A, index: number, array: A[]) => any, thisArg: any = this): Option<A> {

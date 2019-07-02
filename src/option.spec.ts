@@ -153,14 +153,19 @@ describe("Option", () => {
 
     })
 
-    describe("flatten", () => {
+    describe("flat", () => {
 
         it("flattens the nested optional", () => {
-            expect(Some(Some("sasquatchIt")).flatten<string>().get).to.equal("sasquatchIt")
+            expect(Some(Some("sasquatchIt")).flat().get).to.equal("sasquatchIt")
+        })
+
+        it("flattens deeply nested optionals", () => {
+            const foo: string = Some(Some(Some(Some("sasquatchIt")))).flat().get
+            expect(Some(Some(Some(Some("sasquatchIt")))).flat().get).to.equal("sasquatchIt")
         })
 
         it("returns an empty option when the value is not present", () => {
-            expect(None.flatten().orNull).to.be.null
+            expect(None.flat().orNull).to.be.null
         })
 
     })
